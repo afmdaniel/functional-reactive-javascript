@@ -3,6 +3,19 @@ const path = require('path')
 
 const directory = path.join(__dirname, 'legendas')
 
+function composicao(...fn) {
+    return function(valor) {
+        return fn.reduce(async (acc, fn) => {
+            // Verifica se acc é uma promisse
+            if(Promise.resolve(acc) === acc) {
+                return fn(await acc)
+            } else {
+                return fn(acc)
+            }
+        }, valor)
+    }
+}
+
 function getFilesWithPath(directory) {
     return new Promise((resolve, reject) => {
         try {
@@ -94,19 +107,39 @@ function orderByNumericAttribute(attr) {
     }
 }
 
-getFilesWithPath(directory)
-    .then(getFilesByExtension('.srt'))
-    .then(getDataFromFiles)
-    .then(mergeContent)
-    .then(splitContentByLine)
-    .then(removeVoidLines)
-    .then(removeLinesWithPattern('-->'))
-    .then(removeNumberedLines)
-    .then(removeCaracters(symbols))
-    .then(mergeContent)
-    .then(splitContentByWord)
-    .then(removeVoidLines)
-    .then(removeNumberedLines)
-    .then(countByWord)
-    .then(orderByNumericAttribute('qtd'))
-    .then(console.log)
+const wordsList = composicao(
+    getFilesWithPath,
+    getFilesByExtension('.srt'),
+    getDataFromFiles,
+    mergeContent,
+    splitContentByLine,
+    removeVoidLines,
+    removeLinesWithPattern('-->'),
+    removeNumberedLines,
+    removeCaracters(symbols),
+    mergeContent,
+    splitContentByWord,
+    removeVoidLines,
+    removeNumberedLines,
+    countByWord,
+    orderByNumericAttribute('qtd')
+)
+
+wordsList(directory).then(console.log)
+
+// getFilesWithPath(directory)
+//     .then(getFilesByExtension('.srt'))
+//     .then(getDataFromFiles)
+//     .then(mergeContent)
+//     .then(splitContentByLine)
+//     .then(removeVoidLines)
+//     .then(removeLinesWithPattern('-->'))
+//     .then(removeNumberedLines)
+//     .then(removeCaracters(symbols))
+//     .then(mergeContent)
+//     .then(splitContentByWord)
+//     .then(removeVoidLines)
+//     .then(removeNumberedLines)
+//     .then(countByWord)
+//     .then(orderByNumericAttribute('qtd'))
+//     .then(console.log)
