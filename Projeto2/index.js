@@ -100,7 +100,7 @@ const symbols = [
     '!'
 ]
 
-const subtitlesPath = path.join(__dirname, 'legendas')
+const subtitlesPath = path.join(__dirname, '..', 'legendas')
 readDir(subtitlesPath)
     .pipe(
         getFilesByExtension('.srt'),

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path')
 
-const directory = path.join(__dirname, 'legendas')
+const directory = path.join(__dirname, '..', 'legendas')
 
 function composicao(...fn) {
     return function(valor) {
